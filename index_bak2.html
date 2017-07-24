@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#ffffff">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="../../favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="../../favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="mask-icon" href="../../safari-pinned-tab.svg" color="#5bbad5">
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<title>Canvas bubble speed test</title>
+
+<style>
+	.panel {
+		width:540px;
+		height:740px;
+		padding:0px;
+		margin:0 auto;	
+	}
+	
+	#fps {
+		padding:0;
+		margin:0;
+	}
+
+</style>
+
+</head>
+<body>
+
+<div class="panel panel-default">
+<p><b>Bubble speed test</b></p>
+<!-- initiate the canvas -->
+<canvas id="canvas-bubbles" width="500" height="500" style="border:1px solid #d3d3d3;"></canvas>
+<!-- controls -->
+<input id="numBubblesInput" type="number" name="quantity" min="1" max="1000" value="100">
+<!--<button id="startButton" onclick="startInterval()">Start</button>-->
+<button id="startButton" onclick="start()">Start</button>
+<button id="stopButton" onclick="stopInterval()">Stop</button>
+<button id="animateButton" onclick="swapDeployment()">Animate</button>
+<button id="resetButton" onclick="resetBubbles()">Reset</button><br>
+<p><div id="bubbleStatusDiv"></div><br>
+<span id="fps"></span></p>
+    
+ <!--    <label for="allAtOnce" class="label label-styling">Draw all bubbles at once, or by interval 60/1000:</label>-->
+<!--    <button id="allAtOnce" onclick="setAllAtOnce()" class="btn btn-default" style="height:40px;">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
+<!--    <button id="allAtOnce" onclick="setAllAtOnce()">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
+    <!-- information -->    
+ <!--   <div id="gbc-box" class="alert alert-info alert-dismissable fade in">
+         <strong><span id="gb-collector">Garbage Collector!</span></strong>
+    </div>-->
+    <p>Type in the number bubbles you want to generate and hit "Start" </p>
+<!--    <p>(max: 1000, min: 1, default: 100)<br></p>-->
+    If you hit the <b>"All at once"</b> button all bubbles are generated at once in a for-loop<br>
+    if not, they are generated every 60/1000 microsecond.
+    </small> PS: You can change the number and restart at any time.<br>
+	Currently "All at once" is set to <span id="allAtOnceBadge" class="badge">true</span><br></small></p>
+    <p><a href="../../index.html">Back to homepage</a></p>
+
+<script type="text/javascript">
+	var lastCalledTime;
+	var fps;
+	var canv;
+	var cont;
+	var index;
+	var numBubbles;
+	var bubbleSizes = [];
+	var fillColor = [];
+	var bubblePos = [];
+	var xpos;
+	var ypos;
+	var bubbleStatus;
+	var intervalId;
+	var animate = true; // boolean
+	var restart = false; 
+	// constructor
+	function init() {
+		// call stopInterval to stop any intervals that may have been started
+		//clearInterval(intervalID);
+		if (intervalId) {
+			stopInterval();
+		}
+		// initial random positions
+		xpos = Math.floor(Math.random()*500)+1;
+		ypos = Math.floor(Math.random()*500)+1;
+		
+		index = 0;
+		// get a pointer to the canvas
+		canv = document.getElementById("canvas-bubbles");
+		cont = canv.getContext("2d");
+		// clear canvas if restarted
+		cont.clearRect(0, 0, 500, 500);
+		// initiate input elements
+		var numBubblesInput = document.getElementById("numBubblesInput");
+		numBubbles = numBubblesInput.value;
+/*		var startButton = document.getElementById("startButton");
+		startButton.textContent = "Restart";*/
+		var resetButton = document.getElementById("resetButton");
+		resetButton.textContent = "Reset";
+		
+		var animateButton = document.getElementById("animateButton");
+		if (animate) {
+			animateButton.textContent = "Animate";	
+		} else {
+			animateButton.textContent = "All at once";		
+		}
+				
+				
+		bubbleStatus = document.getElementById("bubbleStatusDiv");
+		bubbleStatus.innerHTML = numBubbles;
+	}
+	
+	function swapDeployment() {
+		animate = !animate;	
+		if (animate) {
+			animateButton.textContent = "Animate";	
+		} else {
+			animateButton.textContent = "All at once";		
+		}
+	}
+	
+	function start() {
+		// Start generate bubbles!
+		if (animate) {
+			init();
+			startInterval();
+		} else {
+			init();
+			deployByLoop();
+			startInterval();	
+		}
+	}
+	
+	function deployByLoop() {
+		for (var i=0; i<numBubbles; i++) {
+			deployBubbles()	
+		}
+	}
+	
+/*	function swapRestart() {
+		restart = !restart;	
+		if (restart) {
+			startButton.textContent = "Restart";
+		} else {
+			startButton.textContent = "Start";	
+		}
+		init(); 
+	}*/
+	
+	function drawBubbles(rad, xpos, ypos, fillColor) {
+      	cont.beginPath();
+      	cont.arc(xpos, ypos, rad, 0, 2 * Math.PI, false);
+      	cont.fillStyle = fillColor;
+      	cont.fill();
+	}
+	
+	function deployBubbles() {
+		bubbleStatus.innerHTML = index+1 + " bubbles has been generated";
+		bubbleSizes[index] = Math.floor(Math.random()*100)+1;
+		bubblePos[index] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1};
+		fillColor[index] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+		drawBubbles(bubbleSizes[index], bubblePos[index].x, bubblePos[index].y, fillColor[index]);
+		index++;	
+	}
+
+
+	/* for calculating fps (frames per second) */
+/*	var d = new Date();
+	var millis;
+	var old_millis;
+	var fps;
+	var alertBoxTimer;*/
+		
+	function updateBubbles() {
+/*		d = new Date();
+		millis = d.getMilliseconds();
+		fps = millis - old_millis;
+		var fpsSpan = document.getElementById("fps");
+		if (fps < 0) {
+			fpsSpan.innerHTML = fps + " Garbage collector!" ;
+		} else {
+			fpsSpan.innerHTML = ""+fps;
+		}*/
+
+		
+		if (index < numBubbles) {
+			deployBubbles();
+/*			bubbleStatus.innerHTML = index+1 + " bubbles has been generated";
+			bubbleSizes[index] = Math.floor(Math.random()*100)+1;
+			bubblePos[index] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1};
+			fillColor[index] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+			drawBubbles(bubbleSizes[index], bubblePos[index].x, bubblePos[index].y, fillColor[index]);
+			index++;*/
+		} else {
+			// clear the whole canvas because we need to redraw the<br> 
+			// whole canvas because every bubble has changed size or a new bubble(s) is created
+			cont.clearRect(0, 0, 500, 500);
+			// loop through all the bubbles to either change it's size and redraw it, <br>
+			// or create new bubbles when they becomes smaller than 2 pixels in radius.
+			for (var i=0; i<numBubbles; i++) {
+				// Test each bubble's size. If it's greater than 2 pixels, recalculate and update the size for the current bubble defined in the "bubbleSizes" array.
+				// Regenerate it if it's smaller than 2 pixels in radius.
+				// It seems that the garbage collector is working great without any memory leak with this settup. Every value is reset and 
+				if (bubbleSizes[i] > 2) {
+					bubbleSizes[i] = bubbleSizes[i]*0.98;
+					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+				} else {
+					// create new bubble
+				if (numBubbles < 500) bubbleStatus.innerHTML = "Bubble " + (i+1) + " is reborn!";
+					bubbleSizes[i] = Math.floor(Math.random()*100)+1;
+					bubblePos[i] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1}; 
+					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+				}
+			}
+
+		}
+				// for calculating fps
+/*		if ((millis - alertBoxTimer ) > 100) $('#gbc-box').fadeOut();
+		old_millis = millis;*/
+	}
+	
+	// TODO: add easing to the bubbles with easInCubic to get a make the illution of distance
+	function easeInCubic(x, t, b, c, d) {
+		return c*(t/=d)*t*t + b;
+	}
+	
+	window.countFPS = (function () {
+	  var lastLoop = (new Date()).getMilliseconds();
+	  var count = 1;
+	  var fps = 0;
+	
+	  return function () {
+		  console.log("inside anonymouse function");
+		var currentLoop = (new Date()).getMilliseconds();
+		if (lastLoop > currentLoop) {
+		  fps = count;
+		  count = 1;
+		} else {
+		  count += 1;
+		}
+		lastLoop = currentLoop;
+		return fps;
+	  };
+	}());
+	
+	var $out = $('#fps');
+	(function loop() {
+		$out.html("Current frames per second: "+countFPS());
+		requestAnimationFrame(function () {
+		  
+		  loop();
+		});
+	}());
+	
+	// interval
+	function startInterval() {
+		console.log("startInterval");
+		intervalId = setInterval(function(){
+			updateBubbles();
+		}, 60)
+	}
+	
+	// loop 
+	function startLoop() {
+		console.log("startInterval");
+		init();
+		for (var i=0; i<numBubbles; i++) {
+			updateBubbles();
+		}
+	}
+	
+	function stopInterval() {
+		clearInterval(intervalId);	
+	}
+	
+	function resetBubbles() {
+		cont.clearRect(0, 0, 500, 500);
+		bubbleSizes = [];
+		bubblePos = [];
+		fillColor = [];
+		init();
+		bubbleStatus.innerHTML = "";
+		if (intervalId) {
+			stopInterval();
+		}
+		
+	}
+
+</script>
+
+
+</body>
+</html>

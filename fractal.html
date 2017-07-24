@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    <title>Mandelbrot Fractals in JavaScript</title>
+    	<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <!--
+         This cheat sheet is based on the W3Schools www.w3schools.com Bootstrap tutorial
+         It is assembled and commented by me - Thomas Gabrielsen
+         -->
+
+
+
+</head>
+
+<body>
+    <div class="page-header"><!-- The .page-header class adds a horizontal line under the heading (+ adds some extra space around the element): -->
+        <h2>Generate Mandelbrot Set Fractals in JavaScript.</h2>
+    </div>
+    <div class="container-fluid">
+        <p>Introduction</p> <!-- Wrap <mark> around text </mark> to highlight text.-->
+        <!--<p><abbr title="Generate fractals">Generate Fractals</abbr> is the largest environment organisation, world wide.</p> <!-- Wrap <abbr> around text </abbr> to add dotted underline -->
+        <div class="well">
+			<p>Generate Mandelbrot Set Fractals in JavaScript.</p>
+            
+			As of now the script is equal to the one on Progur, but I have plans for it in the very near future, <br>
+			or I will take it down. I plan to implement several functions on this fractal generator, were one of them is a function that makes you able to zoom in and in and in and in and in...<br></p>
+        
+        
+      
+        	<p>PROGUR!'s article called: <a href="http://http://progur.com/2017/02/create-mandelbrot-fractal-javascript.html" target="_blank">How to Generate Mandelbrot Set Fractals in JavaScript</a></p>and the original source can be downloaded here: 
+      		<p><a href="../../index.html">Back to homepage</a></p>
+        </div
+ 	></div>
+
+<script>
+var myCanvas;
+var ctx;
+(function() {
+    // Create Canvas
+    myCanvas = document.createElement("canvas");
+    myCanvas.width=1300;
+    myCanvas.height=850;
+    document.body.appendChild(myCanvas);
+    ctx = myCanvas.getContext("2d");
+
+    // Start drawing
+})();
+
+function checkIfBelongsToMandelbrotSet(x,y) {
+    var realComponentOfResult = x;
+    var imaginaryComponentOfResult = y;
+    var maxIterations = 100;
+
+    for(var i = 0; i < maxIterations; i++) {
+         var tempRealComponent = realComponentOfResult * realComponentOfResult
+                                 - imaginaryComponentOfResult * imaginaryComponentOfResult
+                                 + x;
+         var tempImaginaryComponent = 2 * realComponentOfResult * imaginaryComponentOfResult
+                                 + y;
+         realComponentOfResult = tempRealComponent;
+         imaginaryComponentOfResult = tempImaginaryComponent;
+
+         // Return a number as a percentage
+         if(realComponentOfResult * imaginaryComponentOfResult > 5) 
+            return (i/maxIterations * 100);
+    }
+    return 0;   // Return zero if in set        
+}   
+
+
+var magnificationFactor = 2900;
+var panX = 0.7;
+var panY = 0.6;
+for(var x=0; x < myCanvas.width; x++) {
+   for(var y=0; y < myCanvas.height; y++) {
+       var belongsToSet = checkIfBelongsToMandelbrotSet(x / magnificationFactor - panX, y / magnificationFactor - panY);
+		if(belongsToSet == 0) {
+			ctx.fillStyle = '#000';
+			ctx.fillRect(x,y, 1,1); // Draw a black pixel
+		} else {
+			ctx.fillStyle = 'hsl(0, 100%, ' + belongsToSet + '%)';
+			ctx.fillRect(x,y, 1,1); // Draw a colorful pixel
+		}            
+   } 
+}
+
+
+
+
+
+
+</script>
+
+
+</body>
+</html>

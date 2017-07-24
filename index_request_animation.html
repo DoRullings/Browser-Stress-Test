@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<title>Canvas bubble speed test</title>
+
+<style>
+	.panel {
+		width:540px;
+		height:740px;
+		padding:20px;
+		margin:0 auto;	
+	}
+
+</style>
+
+</head>
+<body>
+
+<div class="panel panel-default">
+<p><b>Bubble speed test</b></p>
+<!-- initiate the canvas -->
+<canvas id="canvas-bubbles" width="500" height="500" style="border:1px solid #d3d3d3;"></canvas>
+<!-- controls -->
+<input id="numBubblesInput" type="number" name="quantity" min="1" max="1000" value="100">
+<button id="startButton" onclick="init()">Start</button>
+<button id="stopButton" onclick="stopInterval()">Stop</button><br><div id="bubbleStatusDiv"></div><br>
+<!-- information -->
+<p><b>Type in the number bubbles you want to generate and hit "Start" </b><br>
+<small>(max: 1000, min: 1, default: 100)<br>
+PS: You can change the number and restart at any time.</small></p>
+<p><a href="../../index.html">Back to homepage</a></p>
+</div>
+
+<script type="text/javascript">
+	var lastCalledTime;
+	var fps;
+	var canv;
+	var cont;
+	var index;
+	var numBubbles;
+	var bubbleSizes = [numBubbles];
+	var fillColor = [numBubbles];
+	var bubblePos = [{x:numBubbles, y:numBubbles+1}];
+	var xpos;
+	var ypos;
+	var bubbleStatus;
+	var intervalId;
+	// constructor
+	function init() {
+		// initial random positions
+		xpos = Math.floor(Math.random()*500)+1;
+		ypos = Math.floor(Math.random()*500)+1;
+		
+		index = 0;
+		// get a pointer to the canvas
+		canv = document.getElementById("canvas-bubbles");
+		cont = canv.getContext("2d");
+		// clear canvas if restarted
+		cont.clearRect(0, 0, 500, 500);
+		// initiate input elements
+		var numBubblesInput = document.getElementById("numBubblesInput");
+		numBubbles = numBubblesInput.value;
+		var startButton = document.getElementById("startButton");
+		startButton.textContent = "Restart";
+		
+		bubbleStatus = document.getElementById("bubbleStatusDiv");
+		bubbleStatus.innerHTML = "100";
+
+		// create number input
+/*		var x = document.createElement("INPUT");
+		x.setAttribute("type", "number");
+		x.setAttribute("value", "12345");
+		document.body.appendChild(x);*/
+		startInterval();
+	}
+	
+	function drawBubbles(rad, xpos, ypos, fillColor) {
+      	cont.beginPath();
+      	cont.arc(xpos, ypos, rad, 0, 2 * Math.PI, false);
+      	cont.fillStyle = fillColor;
+      	cont.fill();
+	}
+	
+	function updateBubbles() {
+		
+		if (index < numBubbles) {
+			bubbleStatus.innerHTML = index + " bubbles has been generated";
+			bubbleSizes[index] = Math.floor(Math.random()*100)+1;
+			bubblePos[index] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1};
+			fillColor[index] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+			drawBubbles(bubbleSizes[index], bubblePos[index].x, bubblePos[index].y, fillColor[index]);
+			index++;
+		} else {
+			// clear the whole canvas because we need to redraw the 
+			// whole canvas because every bubble has changed size or a new bubble(s) is created
+			cont.clearRect(0, 0, 500, 500);
+			// loop through all the bubbles to either change it's size and redraw it, <br>
+			// or create new bubbles when bubbles they becomes smaller than 2 pixels in radius.
+			for (var i=0; i<numBubbles; i++) {
+				// 
+				if (bubbleSizes[i] > 2) {
+					bubbleSizes[i] = bubbleSizes[i]*0.995;
+					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+				} else {
+					// create new bubble
+					if (numBubbles < 500) bubbleStatus.innerHTML = "Bubble " + i + " is reborn!";
+					bubbleSizes[i] = Math.floor(Math.random()*100)+1;
+					bubblePos[i] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1}; 
+					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+				}
+			}
+		}
+	}
+	
+	// TODO: add easing to the bubbles with easInCubic to get a make the illution of distance
+	function easeInCubic(x, t, b, c, d) {
+		return c*(t/=d)*t*t + b;
+	}
+	
+	function requestAnimFrame() {
+
+		if(!lastCalledTime) {
+			lastCalledTime = Date.now();
+			fps = 0;
+			return;
+		}
+		delta = (Date.now() - lastCalledTime)/1000;
+		lastCalledTime = Date.now();
+		return 1/delta;
+	} 
+	
+	// loop
+	function startInterval() {
+		intervalID = setInterval(function(){
+			updateBubbles();
+		}, 10)
+	}
+	
+	function stopInterval() {
+		clearInterval(intervalID);	
+	}
+
+</script>
+
+
+</body>
+</html>

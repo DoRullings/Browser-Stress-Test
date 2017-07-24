@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--<script src="canvas.js" type="text/javascript"></script>-->
+<title>Canvas</title>
+
+
+</head>
+<body>
+
+<div class="panel panel-default">
+<canvas id="canvas-bubbles" width="500" height="500" style="border:1px solid #d3d3d3;"></canvas>
+</div>
+<button id="startButton" onclick="init()">Start</button>
+<input id="numBubblesInput" type="number" name="quantity" min="1" max="100" value="100">
+<script type="text/javascript">
+	var canv;
+	var cont;
+	var index;
+	var numBubbles;
+	var bubbleSizes = [numBubbles];
+	var fillColor = [numBubbles];
+	var bubblePos = [{x:numBubbles, y:numBubbles+1}];
+	var xpos;
+	var ypos;
+	// constructor
+	function init() {
+		xpos = Math.floor(Math.random()*500)+1;
+		ypos = Math.floor(Math.random()*500)+1;
+		index = 0;
+		canv = document.getElementById("canvas-bubbles");
+		cont = canv.getContext("2d");
+		// initiate input elements
+		var numBubblesInput = document.getElementById("numBubblesInput");
+		numBubbles = numBubblesInput.value;
+		var startButton = document.getElementById("startButton");
+		startButton.textContent = "Restart";
+		// create number input
+/*		var x = document.createElement("INPUT");
+		x.setAttribute("type", "number");
+		x.setAttribute("value", "12345");
+		document.body.appendChild(x);*/
+		startInterval();
+	}
+	
+	function drawBubbles(rad, xpos, ypos, fillColor) {
+      	cont.beginPath();
+      	cont.arc(xpos, ypos, rad, 0, 2 * Math.PI, false);
+      	cont.fillStyle = fillColor;
+      	cont.fill();
+	}
+	
+	function updateBubbles() {
+		
+		if (index < numBubbles) {
+			bubbleSizes[index] = Math.floor(Math.random()*100)+1;
+			console.log(numBubbles);
+			bubblePos[index] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1};
+			fillColor[index] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+			drawBubbles(bubbleSizes[index], bubblePos[index].x, bubblePos[index].y, fillColor[index]);
+			index++;
+		} else {
+			// clear the whole canvas because we need to redraw the 
+			// whole canvas because every bubble has changed size or a new bubble(s) is created
+			cont.clearRect(0, 0, 500, 500);
+			// loop through all the bubbles to either change it's size and redraw it, <br>
+			// or create new bubbles when bubbles they becomes smaller than 2 pixels in radius.
+			for (var i=0; i<numBubbles; i++) {
+				// 
+				if (bubbleSizes[i] > 2) {
+					bubbleSizes[i] = bubbleSizes[i]*0.995;
+					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+				} else {
+					// create new bubble
+					bubbleSizes[i] = Math.floor(Math.random()*100)+1;
+					bubblePos[i] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1}; 
+					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+				}
+			}
+		}
+	}
+	
+	function easeInCubic(x, t, b, c, d) {
+		return c*(t/=d)*t*t + b;
+	}
+	
+	// loop
+	function startInterval() {
+		setInterval(function(){
+			updateBubbles();
+		}, 10)
+	}
+
+	//init();
+</script>
+
+
+</body>
+</html>

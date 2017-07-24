@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>FPS tests</title>
+    <meta name="theme-color" content="#ffffff">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="../../favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="../../favicon-16x16.png" sizes="16x16">
+	
+</head>
+
+<body>
+<p>Click the button to display the milliseconds of the time right now.</p>
+
+<button onclick="myFunction()">Try it</button>
+
+<p id="demo"></p>
+
+<script>
+	var d = new Date();
+	var millis;
+	var old_millis;
+	var elapsed_millis;
+	function loop() {
+		d = new Date();
+		millis = d.getMilliseconds();
+		elapsed_millis = millis - old_millis;
+		//console.log("millis = " + millis);
+/*		for (var i=0; i<10; i++) {
+			console.log("d.getMilliseconds() = " + d.getMilliseconds());
+		}*/
+		
+		
+		//console.log("old_millis = " + old_millis);
+		console.log("elapsed_time = " + elapsed_millis);
+		//document.getElementById("demo").innerHTML = elapsed_millis;
+		old_millis = millis;
+	}
+	
+
+	function startInterval() {
+		intervalId = setInterval(function(){
+			loop();
+		}, 60)
+	}
+	
+	startInterval();
+</script>
+</body>
+</html>
