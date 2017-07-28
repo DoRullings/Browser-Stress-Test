@@ -77,14 +77,15 @@
                         <input id="numBubblesInput" class="form-control col-xs-4" type="number" name="quantity" min="1" max="10000" value="1000">
                     </div>
                 
-                    <button type="button" class="btn btn-primary" id="startButton" onclick="start()">Start</button>
-                    <button type="button" class="btn btn-primary" id="stopButton" onclick="stopInterval()">Stop</button>
-                    <button type="button" class="btn btn-primary" id="animateButton" onclick="swapDeployment()">Animate</button>
-                    <button type="button" class="btn btn-primary" id="resetButton" onclick="resetBubbles()">Reset</button><br>
+                    <button type="button" class="btn btn-primary" id="startButton" onclick="start()"  title="Start the simulation">Start</button>
+                    <button type="button" class="btn btn-primary" id="stopButton" onclick="stopInterval()" title="Stop/pause the simulation">Stop</button>
+                    <button type="button" class="btn btn-primary" id="resetButton" onclick="resetBubbles()" title="Reset the simulation and clear the canvas">Reset</button>
+                    <button type="button" class="btn btn-primary" id="animateButton" onclick="swapDeployment()" title="Add one element one at the time">One on one</button><br>
+                    
                 </div> <!--btn-group-->
                 <div id="bubbleStatusDiv"></div><br>
                 <p><span id="fps"></span></p>
-                
+                <p><span id="allAtOnceBadge" class="badge">Currently the bubbles are set to animate in each 60/1000 second.</span></p><br>
              <!--    <label for="allAtOnce" class="label label-styling">Draw all bubbles at once, or by interval 60/1000:</label>-->
             <!--    <button id="allAtOnce" onclick="setAllAtOnce()" class="btn btn-default" style="height:40px;">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
             <!--    <button id="allAtOnce" onclick="setAllAtOnce()">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
@@ -97,7 +98,6 @@
                 If you hit the <b>"All at once"</b> button all bubbles are generated at once in a for-loop<br>
                 if not, they are generated every 60/1000 microsecond.
                 PS: You can change the number and restart at any time.<br>
-                Currently "All at once" is set to <span id="allAtOnceBadge" class="badge">true</span><br>
                 <p><a href="../../index.html">Back to homepage</a></p>
 
             </div> <!--col-sm-6-->
@@ -117,9 +117,10 @@
 	var ypos;
 	var bubbleStatus;
 	var intervalId;
-	var animate = true; // boolean
+	var animate = false; // boolean
 	var restart = false; 
 	var animateBadge;
+	
 	// constructor
 	function init() {
 		// call stopInterval to stop any intervals that may have been started
@@ -150,11 +151,13 @@
 		
 		
 		if (animate) {
-			animateButton.textContent = "Animate";
-			animateBadge.innerHTML = "false";
+			animateButton.textContent = "Simultaneously";
+			animateButton.title = "The elements (bubbles) are added simultaniasly";
+			animateBadge.innerHTML = "The elements (bubbles) are added one by one every 60/1000 second one.";
 		} else {
-			animateButton.textContent = "All at once";
-			animateBadge.innerHTML = "true";	
+			animateButton.textContent = "One by one";
+			animateButton.title = "The elements (bubbles) are added one by one";
+			animateBadge.innerHTML = "All the elements (bubbles) are added at the same time";	
 		}
 				
 				
@@ -165,11 +168,13 @@
 	function swapDeployment() {
 		animate = !animate;	
 		if (animate) {
-			animateButton.textContent = "Animate";
-			animateBadge.innerHTML = "false";	
+			animateButton.textContent = "Simultaneously";
+			animateButton.title = "The elements (bubbles) are added simultaniasly";
+			animateBadge.innerHTML = "The elements (bubbles) are added one by one every 60/1000 second one.";	
 		} else {
-			animateButton.textContent = "All at once";
-			animateBadge.innerHTML = "true";		
+			animateButton.textContent = "One by one";
+			animateButton.title = "The elements (bubbles) are added one by one";
+			animateBadge.innerHTML = "All the elements (bubbles) are added at the same time.";		
 		}
 	}
 	
