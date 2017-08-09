@@ -21,11 +21,11 @@
             -->
 <style>
 	
-	.container-fluid {
+/*	.container-fluid {
 		width:1100px;	
-	}
+	}*/
 	
-	.canvas-container {
+/*	.canvas-container {
 		width:600px;	
 	}
 	
@@ -36,8 +36,8 @@
 	
 	.numBubblesInput {
 		width:20px;
-/*		margin:-5px;
-		padding:-5px;	*/
+		margin:-5px;
+		padding:-5px;	
 	}
 	
 	.bubbleInput {
@@ -53,60 +53,73 @@
 	#fps {
 		padding:0;
 		margin:0;
+	}*/
+	
+	.container {
+		width:1200;	
+	}
+	
+	#canvas {
+		width:550px;
+	}
+	
+	.row {
+		float:left;	
 	}
 
 </style>
 
 </head>
 <body>
-	<div class="container-fluid">
+<div class="wrapper">
+	<div class="container">
     	<div class="row">
-            <div class="col-sm-6">
-            	<div id="canvas">
-                	<canvas id="canvas-bubbles" width="500" height="500" style="border:1px solid #d3d3d3;"></canvas>
-              	</div>
-            </div> <!--col-sm-6-->
-            <div class="col-sm-6">
-                <h3>Canvas speed test</h3>
+        	<div class="col-md-8">
+                <div id="canvas">
+                    <canvas id="canvas-bubbles" width="550" height="550" style="border:1px solid #d3d3d3;"></canvas>
+                </div>
+         	</div> <!--col-md-6-->
 
+            <div class="col-md-4 controls">
+                <h3>Canvas speed test</h3>
+               
+                <div class="form-group"><!-- controls -->
+                    <!--<label for="numBubblesInput"># bubbles:</label>-->
+                    <input id="numBubblesInput" class="form-control col-xs-4" type="number" name="quantity" min="1" max="10000" value="1000">
                 
-                <!-- controls -->
-                <div class="form-group">
-                    <div class="col-xs-4">
-                        <!--<label for="numBubblesInput"># bubbles:</label>-->
-                        <input id="numBubblesInput" class="form-control col-xs-4" type="number" name="quantity" min="1" max="10000" value="1000">
-                    </div>
                 
                     <button type="button" class="btn btn-primary" id="startButton" onclick="start()"  title="Start the simulation">Start</button>
                     <button type="button" class="btn btn-primary" id="stopButton" onclick="stopInterval()" title="Stop/pause the simulation">Stop</button>
                     <button type="button" class="btn btn-primary" id="resetButton" onclick="resetBubbles()" title="Reset the simulation and clear the canvas">Reset</button>
                     <button type="button" class="btn btn-primary" id="animateButton" onclick="swapDeployment()" title="Add one element one at the time">One on one</button><br>
                     
-                </div> <!--btn-group-->
+                </div> <!--form-group-->
                 <div id="bubbleStatusDiv"></div><br>
-                <p><span id="fps"></span></p>
-                <p><span id="allAtOnceBadge" class="badge">Currently the bubbles are set to animate in each 60/1000 second.</span></p><br>
-             <!--    <label for="allAtOnce" class="label label-styling">Draw all bubbles at once, or by interval 60/1000:</label>-->
-            <!--    <button id="allAtOnce" onclick="setAllAtOnce()" class="btn btn-default" style="height:40px;">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
-            <!--    <button id="allAtOnce" onclick="setAllAtOnce()">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
-                <!-- information -->    
-             <!--   <div id="gbc-box" class="alert alert-info alert-dismissable fade in">
-                     <strong><span id="gb-collector">Garbage Collector!</span></strong>
-                </div>-->
-                <p>Type in the number bubbles you want to generate and hit "Start" </p>
-            <!--    <p>(max: 1000, min: 1, default: 100)<br></p>-->
-                If you hit the <b>"All at once"</b> button all bubbles are generated at once in a for-loop<br>
-                if not, they are generated every 60/1000 microsecond.
-                PS: You can change the number and restart at any time.<br>
-                <p><a href="../../index.html">Back to homepage</a></p>
-
-            </div> <!--col-sm-6-->
-        </div> <!--row-->
+                    <p><span id="fps"></span></p>
+                    <p><span id="allAtOnceBadge" class="badge">Currently the bubbles are set to animate in each 60/1000 second.</span></p><br>
+                 <!--    <label for="allAtOnce" class="label label-styling">Draw all bubbles at once, or by interval 60/1000:</label>-->
+                <!--    <button id="allAtOnce" onclick="setAllAtOnce()" class="btn btn-default" style="height:40px;">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
+                <!--    <button id="allAtOnce" onclick="setAllAtOnce()">All at once</button><br><div id="bubbleStatusDiv"></div><br>-->
+                    <!-- information -->    
+                 <!--   <div id="gbc-box" class="alert alert-info alert-dismissable fade in">
+                         <strong><span id="gb-collector">Garbage Collector!</span></strong>
+                    </div>-->
+                    <p>Type in the number bubbles you want to generate and hit "Start" </p>
+                <!--    <p>(max: 1000, min: 1, default: 100)<br></p>-->
+                    If you hit the <b>"All at once"</b> button all bubbles are generated at once in a for-loop<br>
+                    if not, they are generated every 60/1000 microsecond.
+                    PS: You can change the number and restart at any time.<br>
+                    <p><a href="../../index.html">Back to homepage</a></p>
+			</div><!-- col-md-6-->
+        </div> <!-- row -->
     </div> <!--container-fluid-->
+</div> <!-- wrapper -->
 <script type="text/javascript">
 	var lastCalledTime;
 	var fps;
-	var canv;
+	var canvas;
+	var canvasWidth;
+	var canvasHeight;
 	var cont;
 	var index;
 	var numBubbles;
@@ -120,7 +133,7 @@
 	var animate = false; // boolean
 	var restart = false; 
 	var animateBadge;
-	
+	var averageFps = [10];
 	// constructor
 	function init() {
 		// call stopInterval to stop any intervals that may have been started
@@ -128,16 +141,20 @@
 		if (intervalId) {
 			stopInterval();
 		}
+		canvasWidth = 550;
+		canvasHeight = 550;
 		// initial random positions
-		xpos = Math.floor(Math.random()*500)+1;
-		ypos = Math.floor(Math.random()*500)+1;
+		xpos = Math.floor(Math.random()*canvasWidth)+1;
+		ypos = Math.floor(Math.random()*canvasHeight)+1;
 		
 		index = 0;
 		// get a pointer to the canvas
-		canv = document.getElementById("canvas-bubbles");
-		cont = canv.getContext("2d");
+		canvas = document.getElementById("canvas-bubbles");
+		cont = canvas.getContext("2d");
+		
+
 		// clear canvas if restarted
-		cont.clearRect(0, 0, 500, 500);
+		cont.clearRect(0, 0, canvasWidth, canvasHeight);
 		// initiate input elements
 		var numBubblesInput = document.getElementById("numBubblesInput");
 		numBubbles = numBubblesInput.value;
@@ -216,7 +233,7 @@
 	function deployBubbles() {
 		bubbleStatus.innerHTML = index+1 + " bubbles has been generated";
 		bubbleSizes[index] = Math.floor(Math.random()*100)+1;
-		bubblePos[index] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1};
+		bubblePos[index] = {x:Math.floor(Math.random()*canvasWidth)+1, y:Math.floor(Math.random()*canvasHeight)+1};
 		fillColor[index] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
 		drawBubbles(bubbleSizes[index], bubblePos[index].x, bubblePos[index].y, fillColor[index]);
 		index++;	
@@ -230,53 +247,34 @@
 	var fps;
 	var alertBoxTimer;*/
 		
-	function updateBubbles() {
-/*		d = new Date();
-		millis = d.getMilliseconds();
-		fps = millis - old_millis;
-		var fpsSpan = document.getElementById("fps");
-		if (fps < 0) {
-			fpsSpan.innerHTML = fps + " Garbage collector!" ;
-		} else {
-			fpsSpan.innerHTML = ""+fps;
-		}*/
-
-		
-		if (index < numBubbles) {
+	function updateBubbles() {		
+		if (index <= numBubbles) {
 			deployBubbles();
-/*			bubbleStatus.innerHTML = index+1 + " bubbles has been generated";
-			bubbleSizes[index] = Math.floor(Math.random()*100)+1;
-			bubblePos[index] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1};
-			fillColor[index] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
-			drawBubbles(bubbleSizes[index], bubblePos[index].x, bubblePos[index].y, fillColor[index]);
-			index++;*/
-		} else {
+		}
 			// clear the whole canvas because we need to redraw the<br> 
 			// whole canvas because every bubble has changed size or a new bubble(s) is created
-			cont.clearRect(0, 0, 500, 500);
-			// loop through all the bubbles to either change it's size and redraw it, <br>
-			// or create new bubbles when they becomes smaller than 2 pixels in radius.
-			for (var i=0; i<numBubbles; i++) {
-				// Test each bubble's size. If it's greater than 2 pixels, recalculate and update the size for the current bubble defined in the "bubbleSizes" array.
-				// Regenerate it if it's smaller than 2 pixels in radius.
-				// It seems that the garbage collector is working great without any memory leak with this settup. Every value is reset and 
-				if (bubbleSizes[i] > 2) {
-					bubbleSizes[i] = bubbleSizes[i]*0.98;
-					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
-				} else {
-					// create new bubble
+		cont.clearRect(0, 0, canvasWidth, canvasHeight);
+		// loop through all the bubbles to either change it's size and redraw it, <br>
+		// or create new bubbles when they becomes smaller than 2 pixels in radius.
+		
+		for (var i=0; i<index; i++) {
+			// Test each bubble's size. If it's greater than 2 pixels, recalculate and update the size for the current bubble defined in the "bubbleSizes" array.
+			// Create a new bubble if it's smaller than 2 pixels in radius.
+			// It seems that the garbage collector is working great without any memory leak with this settup. All variables is reset 
+			if (bubbleSizes[i] > 2) {
+				bubbleSizes[i] = bubbleSizes[i]*0.98;
+				drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
+			} else {
+				// update the "bubble status" field
 				if (numBubbles < 500) bubbleStatus.innerHTML = "Bubble " + (i+1) + " is reborn!";
-					bubbleSizes[i] = Math.floor(Math.random()*100)+1;
-					bubblePos[i] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1}; 
-					drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
-				}
+				// set random sizes, positions and draw new bubbles by calling drawBubbles(param, param, param, param) with the new values
+				bubbleSizes[i] = Math.floor(Math.random()*100)+1;
+				bubblePos[i] = {x:Math.floor(Math.random()*500)+1, y:Math.floor(Math.random()*500)+1}; 
+				drawBubbles(bubbleSizes[i], bubblePos[i].x, bubblePos[i].y, fillColor[i]);
 			}
-
 		}
-				// for calculating fps
-/*		if ((millis - alertBoxTimer ) > 100) $('#gbc-box').fadeOut();
-		old_millis = millis;*/
 	}
+		
 	
 	// TODO: add easing to the bubbles with easInCubic to get a make the illution of distance
 	function easeInCubic(x, t, b, c, d) {
