@@ -1,0 +1,58 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Draw on Canvas</title>
+</head>
+
+<body>
+
+<canvas id="myCanvas" width="800" height="800"> </canvas>
+
+<script>
+
+//	context.beginPath();
+//	context.moveTo(100, 150);
+//	context.lineTo(450, 50);
+//	context.stroke();
+
+	var run_once = false;
+	var oldX;
+	var oldY;
+	function writeMessage(canvas, message) {
+		
+		var context = canvas.getContext('2d');
+		context.clearRect(0, 0, canvas.width, 30);
+		context.font = '18pt Calibri';
+		context.fillStyle = 'black';
+		context.fillText(message, 10, 25);
+		context.beginPath();
+	}
+	function getMousePos(canvas, evt) {
+		var rect = canvas.getBoundingClientRect();
+		var xPos = evt.clientX - rect.left;
+		var yPos = evt.clientY - rect.top;
+		var context = canvas.getContext('2d');
+		context.beginPath();
+		context.moveTo(oldX, oldY);
+		context.lineTo(xPos, yPos);
+		context.stroke();
+		oldX = xPos;
+		oldY = yPos;
+		return {
+	  	x: xPos,
+	  	y: yPos
+		};
+	}
+	var canvas = document.getElementById('myCanvas');
+	var context = canvas.getContext('2d');
+	
+	canvas.addEventListener('mousemove', function(evt) {
+		var mousePos = getMousePos(canvas, evt);
+		var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+		writeMessage(canvas, message);
+	}, false);
+</script>
+</body>
+</html>
